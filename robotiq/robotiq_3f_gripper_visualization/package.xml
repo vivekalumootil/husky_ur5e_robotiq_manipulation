@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>robotiq_3f_gripper_visualization</name>
+  <version>1.0.0</version>
+  <description>Robotiq ARG 3-Finger s-model description package</description>
+  <license>BSD</license>
+  <url type="website">http://ros.org/wiki/robotiq</url>
+  <author>Nicolas Lauzier (Robotiq inc.)</author>
+  <maintainer email="civerachb@clearpathrobotics.com">Chris Iverach-Brereton</maintainer>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <exec_depend>urdf</exec_depend>
+
+</package>

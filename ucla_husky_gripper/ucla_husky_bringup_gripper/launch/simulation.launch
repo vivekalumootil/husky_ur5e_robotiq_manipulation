@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- Params: General Gazebo -->
+  <arg name="use_sim_time" default="true" />
+  <arg name="gui" default="true" />
+  <arg name="headless" default="false" />
+  <arg name="world_name" default="$(find husky_gazebo)/worlds/husky_playpen.world" />
+
+  <!-- Launch: Gazebo World -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="debug" value="0" />
+    <arg name="gui" value="$(arg gui)" />
+    <arg name="use_sim_time" value="$(arg use_sim_time)" />
+    <arg name="headless" value="$(arg headless)" />
+    <arg name="world_name" value="$(arg world_name)" />
+  </include>
+
+  <!-- Params: Husky -->
+  <arg name="config" default="base" />
+  <arg name="x" default="0" />
+  <arg name="y" default="0" />
+  <arg name="z" default="1" />
+  <arg name="yaw" default="0" />
+  <!-- Launch: Description, Control, and Teleop -->
+  <include file="$(find husky_description)/launch/description.launch"/>
+  <include file="$(find husky_control)/launch/control.launch" />
+  <include file="$(find husky_control)/launch/teleop.launch"/>
+
+  <!-- Launch: Spawn Husky -->
+  <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model"
+    args="-urdf -model husky -param robot_description -x $(arg x) -y $(arg y) -z $(arg z) -R 0 -P 0 -Y $(arg yaw)" />
+
+  <!-- Params: Arm controller configuration -->
+  <arg name="arm_config_file" default="$(find ucla_husky_bringup_gripper)/config/ur5e_controllers.yaml" doc="Config file used for defining the ROS-Control controllers."/>
+  <!--arg name="controllers" default="right_ur/joint_state_controller right_ur/right_ur_arm_scaled_pos_joint_traj_controller left_ur/joint_state_controller left_ur/left_ur_arm_scaled_pos_joint_traj_controller " doc="Controllers that are activated by default."/-->
+  <!--arg name="stopped_controllers" default="right_ur/joint_group_pos_controller left_ur/joint_group_pos_controller" doc="Controllers that are initally loaded, but not started."/>
+  <rosparam file="$(arg controller_config_file)" command="load"/-->
+
+
+   <arg name="arm_controllers" default="joint_state_controller ur_arm_scaled_pos_joint_traj_controller robotiq_controller" doc="Controllers that are activated by default."/>
+   <arg name="stopped_controllers" default="joint_group_pos_controller" doc="Controllers that are initally loaded, but not started."/>
+
+
+  <rosparam file="$(arg arm_config_file)" command="load"/>
+  <!-- Load and start the controllers listed in the 'controllers' arg. -->
+  <node name="ros_control_controller_spawner" pkg="controller_manager" type="spawner"
+      args="$(arg arm_controllers)" output="screen" respawn="false" />
+
+  <!-- Load other controllers, but do not start them -->
+  <node name="ros_control_stopped_spawner" pkg="controller_manager" type="spawner"
+      args="--stopped $(arg stopped_controllers)" output="screen" respawn="false" />
+  
+  <!-- Optional: Gripper -->
+  <!-- <group ns="gripper" if="$(arg gripper_enabled)"> 
+    <include file="$(find robotiq_2f_gripper_control)/launch/robotiq_action_server.launch">
+        <arg name="name"        value="gripper_action_server"/>
+        <arg name="delay"       value="10"/>
+        <arg name="comport"     value="/tmp/ttyTool"/>
+        <arg name="joint_name"  value="ur_arm_gripper_finger_joint"/>
+    </include>
+  </group> -->
+</launch>

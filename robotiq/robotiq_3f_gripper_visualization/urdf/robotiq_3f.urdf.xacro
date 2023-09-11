@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="s_model_open">
+
+    <xacro:macro name="robotiq_3f" params="parent prefix *origin">
+
+        <!-- mount the Gripper to the robot -->
+
+        <link name="${prefix}s_model_base_link" />
+        <joint name="${prefix}s_model_base_joint" type="fixed">
+            <parent link="${parent}" />
+            <child link="${prefix}s_model_base_link" />
+            <xacro:insert_block name="origin" />
+        </joint>
+
+        <joint name="${prefix}s_model_adapter" type="fixed" >
+            <origin xyz="0.0 0.0 0.015" rpy="0.0 0.0 0.0"/>
+	          <parent link="${prefix}s_model_base_link" />
+            <child link="${prefix}s_model_adapter_link" />
+        </joint>
+
+        <joint name="${prefix}_s_model_fix" type="fixed" >
+            <origin xyz="0.0 0.0 0.018" rpy="1.5708 0.0 -0.7854"/>
+            <parent link="${prefix}s_model_adapter_link" />
+            <child link="${prefix}s_model_link" />
+        </joint>
+
+        <link name="${prefix}s_model_adapter_link">
+
+        <visual>
+         <origin xyz="0 0 0" rpy="0 0 0" />
+         <geometry>
+          <cylinder radius="0.04" length="0.03"/>
+         </geometry>
+         <material name="black"/>
+        </visual>
+
+         <collision>
+         <origin xyz="0 0 0" rpy="0 0 0"/>
+         <geometry>
+         <cylinder radius="0.04" length="0.03"/>
+         </geometry>
+         <material name="red"/>
+        </collision>
+        </link>
+
+        <link name="${prefix}s_model_link">
+            <visual>
+                <origin xyz="0 0 0" rpy="0 0 0" />
+                <geometry>
+                    <mesh filename="package://robotiq_3f_gripper_visualization/meshes/s_model_open.dae" />
+                </geometry>
+            </visual>
+
+            <collision>
+                <origin xyz="0 0 0" rpy="0 0 0" />
+                <geometry>
+                    <mesh filename="package://robotiq_3f_gripper_visualization/meshes/s_model_open_collision.stl" />
+                </geometry>
+            </collision>
+        </link>
+
+    </xacro:macro>
+</robot>
