@@ -1,6 +1,6 @@
 # husky_ur5e_robotiq_manipulation
 
-This repository is meant to facilitate setting up a Husky robot with a UR5e arm and a Robotiq gripper. ROS Noetic is the only ROS version currently supported. You need a proper Catkin workspace for this tutorial. 
+This repository is meant to facilitate setting up a Husky robot with a UR5e arm and a Robotiq gripper. ROS Noetic is the only ROS version currently supported. You need a proper Catkin workspace for this tutorial, as well as Gazebo 11 and revelant ros_gazebo packages. 
 
 ## Installing this repository
 Go to the /src directory of your Catkin workspace. 
