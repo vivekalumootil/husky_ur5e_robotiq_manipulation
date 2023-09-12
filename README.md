@@ -37,6 +37,7 @@ To attach the arm and gripper to your Husky robot and start the simulation:
 2. roslaunch ucla_husky_bringup_gripper simulation.launch
 ```
 ## Launching the MoveIt package
+Spawn a new terminal window and move to the root directory of your workspace. 
 ```sh
 source devel/setup.bash
 ```
