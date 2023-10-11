@@ -76,8 +76,6 @@ void cloud_callback(const sensor_msgs::PointCloud2ConstPtr& cloud_msg)
   cv::waitKey(1);  
 }
 
-void cloud_cb(const 
-
 /*
 void odom_callback(const nav_msgs::Odometry::ConstPtr& odom_msg)
 {
