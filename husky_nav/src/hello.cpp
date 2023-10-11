@@ -64,7 +64,8 @@ void laser_callback(const sensor_msgs::LaserScan::ConstPtr& msg)
 {
 
   std::vector<std::pair<double,double>> scan_map;
-  double angle = msg->angle_min;
+  //double angle = msg->angle_min;
+  double angle = 0;
   for (int i=0; i<(int) msg->ranges.size(); i++) {
     if (!isinf(msg->ranges[i])) {
       double px = cos(angle) * msg->ranges[i];
@@ -99,14 +100,12 @@ void laser_callback(const sensor_msgs::LaserScan::ConstPtr& msg)
   cv::waitKey(1);  
 }
 
-/*
 void odom_callback(const nav_msgs::Odometry::ConstPtr& odom_msg)
 {
 
-  ROS_INFO("x: %f, y: %f, z: %f", odom_msg->pose.pose.position.x, odom_msg->pose.pose.position.y, odom_msg->pose.pose.position.z); 
-
+  // ROS_INFO("x: %f, y: %f, z: %f", odom_msg->pose.pose.position.x, odom_msg->pose.pose.position.y, odom_msg->pose.pose.position.z); 
+  
 }
-*/
 
 
 /*
@@ -174,7 +173,7 @@ int main(int argc, char** argv)
   ros::init (argc, argv, "cloud_sub_pub");
   ros::NodeHandle nh;
   ros::Rate loop_rate(10);
-  // ros::Subscriber odom_sub_ = nh.subscribe(ODOM_TOPIC, 1, odom_callback);
+  ros::Subscriber odom_sub_ = nh.subscribe(ODOM_TOPIC, 1, odom_callback);
   ros::Subscriber model_states_subscriber = nh.subscribe("/gazebo/model_states", 100, model_states_callback);
   ros::Subscriber laser_sub = nh.subscribe(LASER_TOPIC, 100, laser_callback);
   /*
