@@ -63,12 +63,13 @@ void cloud_callback(const sensor_msgs::PointCloud2ConstPtr& cloud_msg)
 
   cv::Mat drawing(360, 480, CV_8UC3, cv::Scalar(228, 229, 247));
   cv::Rect r(100, 100, 50, 50);
-  cv::rectangle(drawing, r, cv::Scalar(255, 255, 0));
+  cv::rectangle(drawing, r, cv::Scalar(255, 255, 0), -1);
   for (int i=0; i<1000; i++) {
     for (int j=0; j<1000; j++) {
       if (SLAM[i][j] == 1) {
+        std::cout << "located " << i << " " << j << std::endl;
         cv::Rect rect(0.1*i, 0.1*j, 0.1, 0.1);
-        cv::rectangle(drawing, rect, cv::Scalar(255, 255, 0));
+        cv::rectangle(drawing, rect, cv::Scalar(255, 255, 0), -1);
       }
     }
   }
