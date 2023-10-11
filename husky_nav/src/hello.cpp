@@ -53,15 +53,17 @@ void cloud_callback(const sensor_msgs::PointCloud2ConstPtr& cloud_msg)
     data.push_back(cloud_.points[i]);
     auto pt_ = data[i];
     // ROS_INFO("%f, %f, %f", pt_.x, pt_.y, pt_.z);
-    int ind_x = pt_.x/0.01; int ind_y = pt_.y/0.01;
+    int ind_x = (pt_.x+robot_x)/0.01; int ind_y = (pt_.y+robot_y)/0.01;
     if (0 <= ind_x and ind_x < 1000 and 0 <= ind_y and ind_y < 1000 and SLAM[ind_x][ind_y] == 0) {
-      ROS_INFO("%f, %f, %f", pt_.x, pt_.y, pt_.z);
+      ROS_INFO("%f, %f, %f", pt_.x+robot_x, pt_.y+robot_y, pt_.z+robot_z);
       std::cout << "found" << std::endl;
       SLAM[ind_x][ind_y] = 1;
     }
   }
 
   cv::Mat drawing(360, 480, CV_8UC3, cv::Scalar(228, 229, 247));
+  cv::Rect r(100, 100, 50, 50);
+  cv::rectangle(drawing, r, cv::Scalar(255, 255, 0));
   for (int i=0; i<1000; i++) {
     for (int j=0; j<1000; j++) {
       if (SLAM[i][j] == 1) {
