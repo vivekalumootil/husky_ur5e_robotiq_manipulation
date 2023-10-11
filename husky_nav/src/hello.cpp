@@ -162,4 +162,5 @@ int main(int argc, char** argv)
 
   // pub = nh.advertise<sensor_msgs::PointCloud2> ("output", 1);
   ros::spin();
-const sensor_msgs::PointCloud2ConstPtr& cloud_msg}
+  return 0;
+}
