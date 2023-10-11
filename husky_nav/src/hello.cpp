@@ -1,6 +1,15 @@
 #include <iostream>
 #include <vector>
 
+// Gazebo libraries
+#include <gazebo_msgs/LinkStates.h>
+#include <gazebo_msgs/ModelStates.h>
+#include <gazebo_msgs/GetModelState.h>
+
+// Poses
+#include <geometry_msgs/Pose.h>
+#include <geometry_msgs/Twist.h>
+
 // Include the ROS library
 #include <ros/ros.h>
 
