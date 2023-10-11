@@ -24,6 +24,7 @@
 
 // Include PointCloud2 message
 #include <sensor_msgs/PointCloud2.h>
+#include <sensor_msgs/LaserScan.h>
  
 // CV Library
 #include <cv_bridge/cv_bridge.h>
@@ -32,6 +33,7 @@
 #include <opencv2/imgproc/imgproc.hpp>
 
 static const std::string CLOUD_TOPIC = "/realsense/depth/color/points";
+static const std::string LASER_TOPIC = "/front/scan";
 static const std::string ODOM_TOPIC = "/odometry/filtered";
 
 // SLAM[x][y] captures x=[0.01x,0.01x+0.01),y=[0.01y,0.01y+0.01)
@@ -40,25 +42,7 @@ bool SLAM[1000][1000];
 double robot_x; double robot_y; double robot_z;
 
 ros::ServiceClient client; 
-void cloud_callback(const sensor_msgs::PointCloud2ConstPtr& cloud_msg)
-{
-  // ROS_INFO("inside callback"); 
-  pcl::PointCloud<pcl::PointXYZ> cloud_;
-  pcl::fromROSMsg(*cloud_msg, cloud_);
-  std::vector<pcl::PointXYZ> data;
-  
-  for (int i=0; i<cloud_.size(); i++) {
-    data.push_back(cloud_.points[i]);
-    auto pt_ = data[i];
-    // ROS_INFO("%f, %f, %f", pt_.x, pt_.y, pt_.z);
-    int ind_x = (pt_.x+robot_x)/0.01; int ind_y = (pt_.y+robot_y)/0.01;
-    if (0 <= ind_x and ind_x < 1000 and 0 <= ind_y and ind_y < 1000 and SLAM[ind_x][ind_y] == 0) {
-      ROS_INFO("%f, %f, %f", pt_.x+robot_x, pt_.y+robot_y, pt_.z+robot_z);
-      // std::cout << "found" << std::endl;
-      SLAM[ind_x][ind_y] = 1;
-    }
-  }
-
+  /*
   cv::Mat drawing(1200, 1200, CV_8UC3, cv::Scalar(228, 229, 247));
   cv::Rect r(100, 100, 50, 50);
   cv::rectangle(drawing, r, cv::Scalar(255, 255, 0), -1);
@@ -74,6 +58,18 @@ void cloud_callback(const sensor_msgs::PointCloud2ConstPtr& cloud_msg)
   
   cv::imshow("PCL DISPLAY", drawing);
   cv::waitKey(1);  
+*/
+
+void laser_callback(const sensor_msgs::LaserScan::ConstPtr& msg)
+{
+  for (int i=0; i<(int) msg->ranges.size(); i++) {
+    if (!isinf(msg->ranges[i])) {
+      double px = cos(angle) * msg->ranges[i];
+      double py = sin(angle) * msg->ranges[i];
+      scan_map.push_back(std::pair<double, double>(px, py));
+    }
+    angle += msg->angle_increment;
+  }
 }
 
 /*
@@ -151,10 +147,9 @@ int main(int argc, char** argv)
   ros::init (argc, argv, "cloud_sub_pub");
   ros::NodeHandle nh;
   ros::Rate loop_rate(10);
-  ros::Subscriber cloud_sub_ = nh.subscribe(CLOUD_TOPIC, 1, cloud_callback);
   // ros::Subscriber odom_sub_ = nh.subscribe(ODOM_TOPIC, 1, odom_callback);
   ros::Subscriber model_states_subscriber = nh.subscribe("/gazebo/model_states", 100, model_states_callback);
-
+  ros::Subscriber laser_sub = nh.subscriber(LASER_TOPIC, 100, laser_callback);
   /*
   client = nh.serviceClient<gazebo_msgs::GetModelState>("/gazebo/get_model_state");
   gazebo_msgs::GetModelState get_model_state;
@@ -165,4 +160,4 @@ int main(int argc, char** argv)
 
   // pub = nh.advertise<sensor_msgs::PointCloud2> ("output", 1);
   ros::spin();
-}
+const sensor_msgs::PointCloud2ConstPtr& cloud_msg}
