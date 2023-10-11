@@ -34,6 +34,9 @@
 static const std::string CLOUD_TOPIC = "/realsense/depth/color/points";
 static const std::string ODOM_TOPIC = "/odometry/filtered";
 
+// SLAM[x][y] captures x=[0.01x,0.01x+0.01),y=[0.01y,0.01y+0.01)
+bool SLAM[1000][1000];
+
 double robot_x; double robot_y; double robot_z;
 
 // ros::Publisher pub;
@@ -41,7 +44,7 @@ double robot_x; double robot_y; double robot_z;
 ros::ServiceClient client; 
 void cloud_callback(const sensor_msgs::PointCloud2ConstPtr& cloud_msg)
 {
-  ROS_INFO("inside callback"); 
+  // ROS_INFO("inside callback"); 
   pcl::PointCloud<pcl::PointXYZ> cloud_;
   pcl::fromROSMsg(*cloud_msg, cloud_);
   std::vector<pcl::PointXYZ> data;
@@ -50,9 +53,20 @@ void cloud_callback(const sensor_msgs::PointCloud2ConstPtr& cloud_msg)
     data.push_back(cloud_.points[i]);
     auto pt_ = data[i];
     // ROS_INFO("%f, %f, %f", pt_.x, pt_.y, pt_.z);
+    int ind_x = pt_.x/0.01; int ind_y = pt_.y/0.01;
+    bool[ind_x][ind_y] = 1;
   }
-   
+  
   cv::Mat drawing(360, 480, CV_8UC3, cv::Scalar(228, 229, 247));
+  for (int i=0; i<1000; i++) {
+    for (int j=0; j<1000; j++) {
+      if (bool[i][j]) {
+        cv::Rect rect(0.01*i, 0.01*j, 0.01, 0.01);
+        cv::rectangle(drawing, rect, cv::Scalar(0, 255, 0));
+      }
+    }
+  }
+  
   cv::imshow("PCL DISPLAY", drawing);
   cv::waitKey(1);  
 }
@@ -100,7 +114,7 @@ void model_states_callback(gazebo_msgs::ModelStates model_states) {
   robot_x = ((husky_pose).position).x;
   robot_y = ((husky_pose).position).y;
   robot_z = ((husky_pose).position).z;
-  std::cout << "The robot is located at: " << robot_x << " " << robot_y << " " << robot_z << std::endl;
+  // std::cout << "The robot is located at: " << robot_x << " " << robot_y << " " << robot_z << std::endl;
 }
 
 /*

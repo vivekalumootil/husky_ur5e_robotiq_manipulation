@@ -17,8 +17,8 @@
 
   <!-- Params: Husky -->
   <arg name="config" default="base" />
-  <arg name="x" default="0" />
-  <arg name="y" default="0" />
+  <arg name="x" default="4" />
+  <arg name="y" default="4" />
   <arg name="z" default="1" />
   <arg name="yaw" default="0" />
   <!-- Launch: Description, Control, and Teleop -->
