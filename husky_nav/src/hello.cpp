@@ -32,7 +32,8 @@
 #include <opencv2/imgproc/imgproc.hpp>
 
 static const std::string CLOUD_TOPIC = "/realsense/depth/color/points";
-static const std::string ODOM_TOPIC = "/odometry/filtered"; 
+static const std::string ODOM_TOPIC = "/odometry/filtered";
+float  
 // ros::Publisher pub;
 
 ros::ServiceClient client; 
@@ -101,7 +102,7 @@ int main(int argc, char** argv)
   gazebo_msgs::GetModelState get_model_state;
   get_model_state.request.model_name = "husky";
   client.call(get_model_state);
-  std::cout << "The position is " << get_model_state.response.pose << std::endl;
+  std::cout << "The position is " << (get_model_state.response.pose).x << std::endl;
   
   // pub = nh.advertise<sensor_msgs::PointCloud2> ("output", 1);
   ros::spin();
