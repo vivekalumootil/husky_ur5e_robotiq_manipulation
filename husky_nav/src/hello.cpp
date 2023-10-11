@@ -151,7 +151,7 @@ int main(int argc, char** argv)
   ros::Rate loop_rate(10);
   // ros::Subscriber odom_sub_ = nh.subscribe(ODOM_TOPIC, 1, odom_callback);
   ros::Subscriber model_states_subscriber = nh.subscribe("/gazebo/model_states", 100, model_states_callback);
-  ros::Subscriber laser_sub = nh.subscriber(LASER_TOPIC, 100, laser_callback);
+  ros::Subscriber laser_sub = nh.subscribe(LASER_TOPIC, 100, laser_callback);
   /*
   client = nh.serviceClient<gazebo_msgs::GetModelState>("/gazebo/get_model_state");
   gazebo_msgs::GetModelState get_model_state;
