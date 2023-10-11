@@ -54,13 +54,13 @@ void cloud_callback(const sensor_msgs::PointCloud2ConstPtr& cloud_msg)
     auto pt_ = data[i];
     // ROS_INFO("%f, %f, %f", pt_.x, pt_.y, pt_.z);
     int ind_x = pt_.x/0.01; int ind_y = pt_.y/0.01;
-    bool[ind_x][ind_y] = 1;
+    SLAM[ind_x][ind_y] = 1;
   }
   
   cv::Mat drawing(360, 480, CV_8UC3, cv::Scalar(228, 229, 247));
   for (int i=0; i<1000; i++) {
     for (int j=0; j<1000; j++) {
-      if (bool[i][j]) {
+      if (SLAM[i][j]) {
         cv::Rect rect(0.01*i, 0.01*j, 0.01, 0.01);
         cv::rectangle(drawing, rect, cv::Scalar(0, 255, 0));
       }
