@@ -69,7 +69,7 @@ void laser_callback(const sensor_msgs::LaserScan::ConstPtr& msg)
     if (!isinf(msg->ranges[i])) {
       double px = cos(angle) * msg->ranges[i];
       double py = sin(angle) * msg->ranges[i];
-      cout << "found at " << px << " " << py << endl;
+      std::cout << "found at " << px << " " << py << std::endl;
       scan_map.push_back(std::pair<double, double>(px, py));
     }
     angle += msg->angle_increment;
