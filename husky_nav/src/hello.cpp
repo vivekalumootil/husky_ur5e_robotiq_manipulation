@@ -54,17 +54,17 @@ void cloud_callback(const sensor_msgs::PointCloud2ConstPtr& cloud_msg)
     auto pt_ = data[i];
     // ROS_INFO("%f, %f, %f", pt_.x, pt_.y, pt_.z);
     int ind_x = pt_.x/0.01; int ind_y = pt_.y/0.01;
-    if (0 <= ind_x and ind_x < 1000 and 0 <= ind_y and ind_y < 1000) {
+    if (0 <= ind_x and ind_x < 1000 and 0 <= ind_y and ind_y < 1000 and SLAM[ind_x][ind_y] == 0) {
+      std::cout << "found" << std::endl;
       SLAM[ind_x][ind_y] = 1;
     }
   }
 
-  
   cv::Mat drawing(360, 480, CV_8UC3, cv::Scalar(228, 229, 247));
   for (int i=0; i<1000; i++) {
     for (int j=0; j<1000; j++) {
       if (SLAM[i][j]) {
-        cv::Rect rect(0.01*i, 0.01*j, 0.01, 0.01);
+        cv::Rect rect(0.1*i, 0.1*j, 0.1, 0.1);
         cv::rectangle(drawing, rect, cv::Scalar(0, 255, 0));
       }
     }
@@ -74,12 +74,16 @@ void cloud_callback(const sensor_msgs::PointCloud2ConstPtr& cloud_msg)
   cv::waitKey(1);  
 }
 
+/*
 void odom_callback(const nav_msgs::Odometry::ConstPtr& odom_msg)
 {
 
   ROS_INFO("x: %f, y: %f, z: %f", odom_msg->pose.pose.position.x, odom_msg->pose.pose.position.y, odom_msg->pose.pose.position.z); 
 
 }
+*/
+
+
 /*
 void cloud_cb(const sensor_msgs::PointCloud2ConstPtr& cloud_msg)
          {
@@ -146,7 +150,7 @@ int main(int argc, char** argv)
   ros::NodeHandle nh;
   ros::Rate loop_rate(10);
   ros::Subscriber cloud_sub_ = nh.subscribe(CLOUD_TOPIC, 1, cloud_callback);
-  ros::Subscriber odom_sub_ = nh.subscribe(ODOM_TOPIC, 1, odom_callback);
+  // ros::Subscriber odom_sub_ = nh.subscribe(ODOM_TOPIC, 1, odom_callback);
   ros::Subscriber model_states_subscriber = nh.subscribe("/gazebo/model_states", 100, model_states_callback);
 
   /*
