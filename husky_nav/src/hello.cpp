@@ -33,7 +33,9 @@
 
 static const std::string CLOUD_TOPIC = "/realsense/depth/color/points";
 static const std::string ODOM_TOPIC = "/odometry/filtered";
-float  
+
+double robot_x; double robot_y; double robot_z;
+
 // ros::Publisher pub;
 
 ros::ServiceClient client; 
@@ -87,9 +89,31 @@ void cloud_cb(const sensor_msgs::PointCloud2ConstPtr& cloud_msg)
          }
 */
 
-void get_model_state() {
-  
+void model_states_callback(gazebo_msgs::ModelStates model_states) {
+  int ind = 0;
+  for (ind=0; ind<model_states.size(); ind++) {
+    if (model_states.name[ind] == "husky") {
+      break;
+    }
+  }
+  geometry_msgs::Pose husky_pose = model_states.pose[ind];
+  robot_x = ((husky_pose).position).x;
+  robot_y = (husky_pose).position).y;
+  robot_z = ((husky_pose).position).z;
+  std::cout << "The robot is located at: " << robot_x << " " << robot_y << " " << robot_z << std::endl;
 }
+
+/*
+void get_model_state() {
+  gazebo_msgs::GetModelState get_model_state;
+  get_model_state.request.model_name = "husky";
+  client.call(get_model_state);
+  robot_x = ((get_model_state.response.pose).position).x;
+  robot_y = ((get_model_state.response.pose).position).y;
+  robot_z = ((get_model_state.response.pose).position).z;
+}
+*/
+
 int main(int argc, char** argv) 
 {
   ros::init (argc, argv, "cloud_sub_pub");
@@ -97,13 +121,16 @@ int main(int argc, char** argv)
   ros::Rate loop_rate(10);
   ros::Subscriber cloud_sub_ = nh.subscribe(CLOUD_TOPIC, 1, cloud_callback);
   ros::Subscriber odom_sub_ = nh.subscribe(ODOM_TOPIC, 1, odom_callback);
+  ros::Subscriber model_states_subscriber = n.subscribe("/gazebo/model_states", 100, model_states_callback);
 
+  /*
   client = nh.serviceClient<gazebo_msgs::GetModelState>("/gazebo/get_model_state");
   gazebo_msgs::GetModelState get_model_state;
   get_model_state.request.model_name = "husky";
   client.call(get_model_state);
   std::cout << "The position is " << (get_model_state.response.pose).x << std::endl;
-  
+  */
+
   // pub = nh.advertise<sensor_msgs::PointCloud2> ("output", 1);
   ros::spin();
 }
