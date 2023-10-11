@@ -69,6 +69,7 @@ void laser_callback(const sensor_msgs::LaserScan::ConstPtr& msg)
     if (!isinf(msg->ranges[i])) {
       double px = cos(angle) * msg->ranges[i];
       double py = sin(angle) * msg->ranges[i];
+      cout << "found at " << px << " " << py << endl;
       scan_map.push_back(std::pair<double, double>(px, py));
     }
     angle += msg->angle_increment;
@@ -78,7 +79,7 @@ void laser_callback(const sensor_msgs::LaserScan::ConstPtr& msg)
     int ind_x = (scan_map[i].first+robot_x)/0.01; int ind_y = (scan_map[i].second+robot_y)/0.01;
     if (0 <= ind_x and ind_x < 1000 and 0 <= ind_y and ind_y < 1000 and SLAM[ind_x][ind_y] == 0) {
       // ROS_INFO("%f, %f, %f", pt_.x+robot_x, pt_.y+robot_y, pt_.z+robot_z);
-      // std::cout << "found" << std::endl;
+      std::cout << "found" << std::endl;
       SLAM[ind_x][ind_y] = 1;
     }
   }
@@ -87,7 +88,7 @@ void laser_callback(const sensor_msgs::LaserScan::ConstPtr& msg)
   for (int i=0; i<1000; i += 1) {
     for (int j=0; j<1000; j += 1) {
       if (SLAM[i][j] == 1) {
-        // std::cout << "located " << i << " " << j << std::endl;
+        std::cout << "located " << i << " " << j << std::endl;
         cv::Rect rect(i, j, 1, 1);
         cv::rectangle(drawing, rect, cv::Scalar(255, 255, 0), -1);
       }
