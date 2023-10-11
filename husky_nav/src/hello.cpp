@@ -9,6 +9,7 @@
 // Poses
 #include <geometry_msgs/Pose.h>
 #include <geometry_msgs/Twist.h>
+#include <tf/tf.h>
 
 // Include the ROS library
 #include <ros/ros.h>
@@ -39,7 +40,7 @@ static const std::string ODOM_TOPIC = "/odometry/filtered";
 // SLAM[x][y] captures x=[0.01x,0.01x+0.01),y=[0.01y,0.01y+0.01)
 bool SLAM[1000][1000];
 
-double robot_x; double robot_y; double robot_z;
+double robot_x; double robot_y; double robot_z; double robot_dir;
 
 ros::ServiceClient client; 
   /*
@@ -64,8 +65,7 @@ void laser_callback(const sensor_msgs::LaserScan::ConstPtr& msg)
 {
 
   std::vector<std::pair<double,double>> scan_map;
-  //double angle = msg->angle_min;
-  double angle = 0;
+  double angle = msg->angle_min + robot_dir;
   for (int i=0; i<(int) msg->ranges.size(); i++) {
     if (!isinf(msg->ranges[i])) {
       double px = cos(angle) * msg->ranges[i];
@@ -103,7 +103,7 @@ void laser_callback(const sensor_msgs::LaserScan::ConstPtr& msg)
 void odom_callback(const nav_msgs::Odometry::ConstPtr& odom_msg)
 {
 
-  // ROS_INFO("x: %f, y: %f, z: %f", odom_msg->pose.pose.position.x, odom_msg->pose.pose.position.y, odom_msg->pose.pose.position.z); 
+  // ROS_INFO("x: %f, y: %f, z: %f", odom_husky_pose.pose.position.x, odom_husky_pose.pose.position.y, odom_husky_pose.pose.position.z); 
   
 }
 
@@ -145,7 +145,16 @@ void model_states_callback(gazebo_msgs::ModelStates model_states) {
   robot_x = ((husky_pose).position).x;
   robot_y = ((husky_pose).position).y;
   robot_z = ((husky_pose).position).z;
-  // std::cout << "The robot is located at: " << robot_x << " " << robot_y << " " << robot_z << std::endl;
+  tf::Quaternion q(
+        husky_pose.orientation.x,
+        husky_pose.orientation.y,
+        husky_pose.orientation.z,
+        husky_pose.orientation.w);
+  tf::Matrix3x3 m(q);
+  double roll, pitch, yaw;
+  m.getRPY(roll, pitch, yaw);
+  robot_dir = yaw;
+  // std::cout << "The robot is located at: " << robot_x << " " << robot_y << " " << robot_z << " in direction" <<  std::endl;
 }
 
 

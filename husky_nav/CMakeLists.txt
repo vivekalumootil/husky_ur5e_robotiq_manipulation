@@ -12,13 +12,14 @@ find_package(catkin REQUIRED COMPONENTS
   nav_msgs
   gazebo_msgs
   geometry_msgs
+  tf
 )
 
 include_directories(${catkin_INCLUDE_DIRS})
 
 catkin_package(
   LIBRARIES navigate
-  CATKIN_DEPENDS rospy roscpp std_msgs pcl_conversions pcl_ros cv_bridge image_transport nav_msgs gazebo_msgs geometry_msgs
+  CATKIN_DEPENDS rospy roscpp std_msgs pcl_conversions pcl_ros cv_bridge image_transport nav_msgs gazebo_msgs geometry_msgs tf
 )
 
 add_executable(navigate src/hello.cpp)
