@@ -1,6 +1,6 @@
 #include <iostream>
 #include <vector>
-// Hello world
+// Hello world!
 // Gazebo libraries
 #include <gazebo_msgs/LinkStates.h>
 #include <gazebo_msgs/ModelStates.h>
