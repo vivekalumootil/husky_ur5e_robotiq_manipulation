@@ -54,8 +54,11 @@ void cloud_callback(const sensor_msgs::PointCloud2ConstPtr& cloud_msg)
     auto pt_ = data[i];
     // ROS_INFO("%f, %f, %f", pt_.x, pt_.y, pt_.z);
     int ind_x = pt_.x/0.01; int ind_y = pt_.y/0.01;
-    SLAM[ind_x][ind_y] = 1;
+    if (0 <= ind_x and ind_x < 1000 and 0 <= ind_y and ind_y < 1000) {
+      SLAM[ind_x][ind_y] = 1;
+    }
   }
+
   
   cv::Mat drawing(360, 480, CV_8UC3, cv::Scalar(228, 229, 247));
   for (int i=0; i<1000; i++) {
@@ -117,6 +120,14 @@ void model_states_callback(gazebo_msgs::ModelStates model_states) {
   // std::cout << "The robot is located at: " << robot_x << " " << robot_y << " " << robot_z << std::endl;
 }
 
+
+void setup_SLAM() {
+  for (int i=0; i<1000; i++) {
+    for (int j=0; j<1000; j++) {
+      SLAM[i][j] = 0;
+    }
+  }
+}
 /*
 void get_model_state() {
   gazebo_msgs::GetModelState get_model_state;
@@ -130,6 +141,7 @@ void get_model_state() {
 
 int main(int argc, char** argv) 
 {
+  setup_SLAM(); 
   ros::init (argc, argv, "cloud_sub_pub");
   ros::NodeHandle nh;
   ros::Rate loop_rate(10);
