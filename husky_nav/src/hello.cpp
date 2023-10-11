@@ -34,7 +34,7 @@
 static const std::string CLOUD_TOPIC = "/realsense/depth/color/points";
 static const std::string ODOM_TOPIC = "/odometry/filtered";
 
-float robot_x; float robot_y; float robot_z;
+double robot_x; double robot_y; double robot_z;
 
 // ros::Publisher pub;
 
@@ -97,9 +97,9 @@ void model_states_callback(gazebo_msgs::ModelStates model_states) {
     }
   }
   geometry_msgs::Pose husky_pose = model_states.pose[ind];
-  robot_x = (((husky_pose).position).x).data;
-  robot_y = (((husky_pose).position).y).data;
-  robot_z = (((husky_pose).position).z).data;
+  robot_x = ((husky_pose).position).x;
+  robot_y = ((husky_pose).position).y;
+  robot_z = ((husky_pose).position).z;
   std::cout << "The robot is located at: " << robot_x << " " << robot_y << " " << robot_z << std::endl;
 }
 
@@ -121,7 +121,7 @@ int main(int argc, char** argv)
   ros::Rate loop_rate(10);
   ros::Subscriber cloud_sub_ = nh.subscribe(CLOUD_TOPIC, 1, cloud_callback);
   ros::Subscriber odom_sub_ = nh.subscribe(ODOM_TOPIC, 1, odom_callback);
-  ros::Subscriber model_states_subscriber = n.subscribe("/gazebo/model_states", 100, model_states_callback);
+  ros::Subscriber model_states_subscriber = nh.subscribe("/gazebo/model_states", 100, model_states_callback);
 
   /*
   client = nh.serviceClient<gazebo_msgs::GetModelState>("/gazebo/get_model_state");
