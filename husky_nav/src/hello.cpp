@@ -1,6 +1,6 @@
 #include <iostream>
 #include <vector>
-// Hello world!
+
 // Gazebo libraries
 #include <gazebo_msgs/LinkStates.h>
 #include <gazebo_msgs/ModelStates.h>
@@ -35,6 +35,7 @@ static const std::string CLOUD_TOPIC = "/realsense/depth/color/points";
 static const std::string ODOM_TOPIC = "/odometry/filtered"; 
 // ros::Publisher pub;
 
+ros::ServiceClient client; 
 void cloud_callback(const sensor_msgs::PointCloud2ConstPtr& cloud_msg)
 {
   ROS_INFO("inside callback"); 
@@ -85,6 +86,9 @@ void cloud_cb(const sensor_msgs::PointCloud2ConstPtr& cloud_msg)
          }
 */
 
+void get_model_state() {
+  
+}
 int main(int argc, char** argv) 
 {
   ros::init (argc, argv, "cloud_sub_pub");
@@ -92,6 +96,14 @@ int main(int argc, char** argv)
   ros::Rate loop_rate(10);
   ros::Subscriber cloud_sub_ = nh.subscribe(CLOUD_TOPIC, 1, cloud_callback);
   ros::Subscriber odom_sub_ = nh.subscribe(ODOM_TOPIC, 1, odom_callback);
+
+  ros::Subscriber model_states_subscriber = n.subscribe("gazebo/model_states_", 100, model_states_callback);
+  client = nh.serviceClient<gazebo_msgs::GetModelState>("/gazebo/get_model_state");
+  gazebo_msgs::GetModelState get_model_state;
+  get_model_state.request.model_name = "husky";
+  client.call(get_model_state);
+  std::cout << "The position is " << get_model_state.response.pose << std::endl;
+  
   // pub = nh.advertise<sensor_msgs::PointCloud2> ("output", 1);
   ros::spin();
 }
