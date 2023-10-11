@@ -97,7 +97,6 @@ int main(int argc, char** argv)
   ros::Subscriber cloud_sub_ = nh.subscribe(CLOUD_TOPIC, 1, cloud_callback);
   ros::Subscriber odom_sub_ = nh.subscribe(ODOM_TOPIC, 1, odom_callback);
 
-  ros::Subscriber model_states_subscriber = n.subscribe("gazebo/model_states_", 100, model_states_callback);
   client = nh.serviceClient<gazebo_msgs::GetModelState>("/gazebo/get_model_state");
   gazebo_msgs::GetModelState get_model_state;
   get_model_state.request.model_name = "husky";
