@@ -34,7 +34,7 @@
 static const std::string CLOUD_TOPIC = "/realsense/depth/color/points";
 static const std::string ODOM_TOPIC = "/odometry/filtered";
 
-double robot_x; double robot_y; double robot_z;
+float robot_x; float robot_y; float robot_z;
 
 // ros::Publisher pub;
 
@@ -91,15 +91,15 @@ void cloud_cb(const sensor_msgs::PointCloud2ConstPtr& cloud_msg)
 
 void model_states_callback(gazebo_msgs::ModelStates model_states) {
   int ind = 0;
-  for (ind=0; ind<model_states.size(); ind++) {
+  for (ind=0; ind<(model_states.name).size(); ind++) {
     if (model_states.name[ind] == "husky") {
       break;
     }
   }
   geometry_msgs::Pose husky_pose = model_states.pose[ind];
-  robot_x = ((husky_pose).position).x;
-  robot_y = (husky_pose).position).y;
-  robot_z = ((husky_pose).position).z;
+  robot_x = (((husky_pose).position).x).data;
+  robot_y = (((husky_pose).position).y).data;
+  robot_z = (((husky_pose).position).z).data;
   std::cout << "The robot is located at: " << robot_x << " " << robot_y << " " << robot_z << std::endl;
 }
 
