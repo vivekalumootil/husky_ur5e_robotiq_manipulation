@@ -55,6 +55,7 @@ void cloud_callback(const sensor_msgs::PointCloud2ConstPtr& cloud_msg)
     // ROS_INFO("%f, %f, %f", pt_.x, pt_.y, pt_.z);
     int ind_x = pt_.x/0.01; int ind_y = pt_.y/0.01;
     if (0 <= ind_x and ind_x < 1000 and 0 <= ind_y and ind_y < 1000 and SLAM[ind_x][ind_y] == 0) {
+      ROS_INFO("%f, %f, %f", pt_.x, pt_.y, pt_.z);
       std::cout << "found" << std::endl;
       SLAM[ind_x][ind_y] = 1;
     }
@@ -63,9 +64,9 @@ void cloud_callback(const sensor_msgs::PointCloud2ConstPtr& cloud_msg)
   cv::Mat drawing(360, 480, CV_8UC3, cv::Scalar(228, 229, 247));
   for (int i=0; i<1000; i++) {
     for (int j=0; j<1000; j++) {
-      if (SLAM[i][j]) {
+      if (SLAM[i][j] == 1) {
         cv::Rect rect(0.1*i, 0.1*j, 0.1, 0.1);
-        cv::rectangle(drawing, rect, cv::Scalar(0, 255, 0));
+        cv::rectangle(drawing, rect, cv::Scalar(255, 255, 0));
       }
     }
   }
