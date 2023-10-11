@@ -39,8 +39,6 @@ bool SLAM[1000][1000];
 
 double robot_x; double robot_y; double robot_z;
 
-// ros::Publisher pub;
-
 ros::ServiceClient client; 
 void cloud_callback(const sensor_msgs::PointCloud2ConstPtr& cloud_msg)
 {
@@ -56,7 +54,7 @@ void cloud_callback(const sensor_msgs::PointCloud2ConstPtr& cloud_msg)
     int ind_x = (pt_.x+robot_x)/0.01; int ind_y = (pt_.y+robot_y)/0.01;
     if (0 <= ind_x and ind_x < 1000 and 0 <= ind_y and ind_y < 1000 and SLAM[ind_x][ind_y] == 0) {
       ROS_INFO("%f, %f, %f", pt_.x+robot_x, pt_.y+robot_y, pt_.z+robot_z);
-      std::cout << "found" << std::endl;
+      // std::cout << "found" << std::endl;
       SLAM[ind_x][ind_y] = 1;
     }
   }
@@ -67,7 +65,7 @@ void cloud_callback(const sensor_msgs::PointCloud2ConstPtr& cloud_msg)
   for (int i=0; i<1000; i += 1) {
     for (int j=0; j<1000; j += 1) {
       if (SLAM[i][j] == 1) {
-        std::cout << "located " << i << " " << j << std::endl;
+        // std::cout << "located " << i << " " << j << std::endl;
         cv::Rect rect(i, j, 1, 1);
         cv::rectangle(drawing, rect, cv::Scalar(255, 255, 0), -1);
       }
@@ -77,6 +75,8 @@ void cloud_callback(const sensor_msgs::PointCloud2ConstPtr& cloud_msg)
   cv::imshow("PCL DISPLAY", drawing);
   cv::waitKey(1);  
 }
+
+void cloud_cb(const 
 
 /*
 void odom_callback(const nav_msgs::Odometry::ConstPtr& odom_msg)
