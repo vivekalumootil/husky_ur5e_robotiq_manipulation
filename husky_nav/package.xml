@@ -17,6 +17,7 @@
   <depend>image_transport</depend>
   <depend>cv_bridge</depend>
   <depend>nav_msgs</depend>
+  <depend>gazebo_msgs</depend>
 
   <export>
   </export>
