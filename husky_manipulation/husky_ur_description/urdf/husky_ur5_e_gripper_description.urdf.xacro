@@ -4,7 +4,8 @@
   <xacro:include filename="$(find ur_description)/urdf/inc/ur5e_macro.xacro" />
 
   <!-- Parameters -->
-  <xacro:arg name="arm_xyz" default="$(optenv HUSKY_UR_XYZ -0.105 0.0 0.0)"/>
+  <!--xacro:arg name="arm_xyz" default="$(optenv HUSKY_UR_XYZ -0.105 0.0 0.0)"/-->
+  <xacro:arg name="arm_xyz" default="$(optenv HUSKY_UR_XYZ -0.5 0.0 0.0)"/>
   <xacro:arg name="arm_rpy" default="$(optenv HUSKY_UR_RPY 0 0 3.1415927)"/>
   <xacro:arg name="arm_gripper_enable" default="$(optenv HUSKY_UR_GRIPPER_ENABLED 0)" />
 
