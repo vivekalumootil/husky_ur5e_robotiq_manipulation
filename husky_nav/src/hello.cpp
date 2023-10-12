@@ -22,6 +22,8 @@
 #include <image_transport/image_transport.h>
 #include <opencv2/imgproc/imgproc.hpp>
 
+// Hello world
+
 static const std::string CLOUD_TOPIC = "/realsense/depth/color/points";
 static const std::string ODOM_TOPIC = "/odometry/filtered"; 
 // ros::Publisher pub;
