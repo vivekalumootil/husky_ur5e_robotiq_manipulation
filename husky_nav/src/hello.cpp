@@ -96,7 +96,7 @@ void laser_callback(const sensor_msgs::LaserScan::ConstPtr& msg)
       }
     }
   }
-  cv::Rect rect(robot_x, robot_y, 15, 15);
+  cv::Rect rect(robot_x/0.01, robot_y/0.01, 15, 15);
   cv::rectangle(drawing, rect, cv::Scalar(255, 128, 0), -1);
 
   cv::imshow("PCL DISPLAY", drawing);
