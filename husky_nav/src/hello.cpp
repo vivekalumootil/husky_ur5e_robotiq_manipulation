@@ -91,12 +91,12 @@ void laser_callback(const sensor_msgs::LaserScan::ConstPtr& msg)
     for (int j=0; j<1000; j += 1) {
       if (SLAM[i][j] == 1) {
         // std::cout << "located " << i << " " << j << std::endl;
-        cv::Rect rect(i+600, j+600, 3, 3);
-        cv::rectangle(drawing, rect, cv::Scalar(255, rand() % 256, 0), -1);
+        cv::Rect rect(i, j, 3, 3);
+        cv::rectangle(drawing, rect, cv::Scalar(255, 255, 0), -1);
       }
     }
   }
-  cv::Rect rect(600, 600, 25, 25);
+  cv::Rect rect(robot_x, robot_y, 15, 15);
   cv::rectangle(drawing, rect, cv::Scalar(255, 128, 0), -1);
 
   cv::imshow("PCL DISPLAY", drawing);
