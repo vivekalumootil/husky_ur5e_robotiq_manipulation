@@ -90,7 +90,7 @@ void laser_callback(const sensor_msgs::LaserScan::ConstPtr& msg)
     for (int j=0; j<1000; j += 1) {
       if (SLAM[i][j] == 1) {
         std::cout << "located " << i << " " << j << std::endl;
-        cv::Rect rect(i, j, 1, 1);
+        cv::Rect rect(i, j, 3, 3);
         cv::rectangle(drawing, rect, cv::Scalar(255, 255, 0), -1);
       }
     }
@@ -154,7 +154,7 @@ void model_states_callback(gazebo_msgs::ModelStates model_states) {
   double roll, pitch, yaw;
   m.getRPY(roll, pitch, yaw);
   robot_dir = yaw;
-  // std::cout << "The robot is located at: " << robot_x << " " << robot_y << " " << robot_z << " in direction" <<  std::endl;
+  std::cout << "The robot is located at: " << robot_x << " " << robot_y << " " << robot_z << " in direction" <<  std::endl;
 }
 
 
