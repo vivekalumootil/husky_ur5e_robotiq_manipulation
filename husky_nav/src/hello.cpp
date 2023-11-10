@@ -66,6 +66,7 @@ void laser_callback(const sensor_msgs::LaserScan::ConstPtr& msg)
 {
 
   std::vector<std::pair<double,double>> scan_map;
+  std::cout << msg->angle_min << std::endl;
   double angle = msg->angle_min + robot_dir;
   for (int i=0; i<(int) msg->ranges.size(); i++) {
     if (!isinf(msg->ranges[i])) {
