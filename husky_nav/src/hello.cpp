@@ -43,6 +43,12 @@ bool SLAM[1000][1000];
 
 double robot_x; double robot_y; double robot_z; double robot_dir;
 
+double rotate(double x1, double y1, double theta, double& xr, double& yr)
+{
+  xr = x1*cos(theta)-y1*sin(theta);
+  yr = x1*sin(theta)+y1*cos(theta);
+}
+
 ros::ServiceClient client; 
   /*
   cv::Mat drawing(1200, 1200, CV_8UC3, cv::Scalar(228, 229, 247));
@@ -67,19 +73,21 @@ void laser_callback(const sensor_msgs::LaserScan::ConstPtr& msg)
 
   std::vector<std::pair<double,double>> scan_map;
   std::cout << msg->angle_min << std::endl;
-  double angle = msg->angle_min + robot_dir;
+  double angle = msg->angle_min;
   for (int i=0; i<(int) msg->ranges.size(); i++) {
     if (!isinf(msg->ranges[i])) {
       double px = cos(angle) * msg->ranges[i];
       double py = sin(angle) * msg->ranges[i];
+      double fx; double fy;
+      rotate(px, py, robot_dir, fx, fy);
       // std::cout << "found at " << px << " " << py << std::endl;
-      scan_map.push_back(std::pair<double, double>(px, py));
+      scan_map.push_back(std::pair<double, double>(fx+robot_x, fy+robot_y));
     }
     angle += msg->angle_increment;
   }
 
   for (int i=0; i<scan_map.size(); i++) {
-    int ind_x = (scan_map[i].first+robot_x)/0.01; int ind_y = (scan_map[i].second+robot_y)/0.01;
+    int ind_x = (scan_map[i].first)/0.01; int ind_y = (scan_map[i].second)/0.01;
     if (0 <= ind_x and ind_x < 1000 and 0 <= ind_y and ind_y < 1000 and SLAM[ind_x][ind_y] == 0) {
       // ROS_INFO("%f, %f, %f", pt_.x+robot_x, pt_.y+robot_y, pt_.z+robot_z);
       // std::cout << "found" << std::endl;
