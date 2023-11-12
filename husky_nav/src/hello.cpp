@@ -80,8 +80,10 @@ void map_callback(const nav_msgs::OccupancyGrid::ConstPtr& msg)
     cv::Mat drawing(4000, 4000, CV_8UC3, cv::Scalar(228, 229, 247));
     for (int i=0; i<4000; i++) {
         for (int j=0; j<4000; j++) {
-            cv::Rect rect(i, j, 1, 1);
-            cv::rectangle(drawing, rect, cv::Scalar(255, 255, 0), -1);
+            if ((msg->data)[i][j] == 1) {
+                cv::Rect rect(i, j, 1, 1);
+                cv::rectangle(drawing, rect, cv::Scalar(255, 255, 0), -1);
+            }
         }
     }
     cv::imshow("WORLD DISPLAY", drawing);
