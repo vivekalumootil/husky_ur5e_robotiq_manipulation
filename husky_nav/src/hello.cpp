@@ -75,12 +75,14 @@ void map_callback(const nav_msgs::OccupancyGrid::ConstPtr& msg)
     nav_msgs::MapMetaData info = msg->info;
     ROS_INFO("Got map %d %d", info.width, info.height);
     geometry_msgs::Pose origin = info.origin;
+    float res = info.resolution;
+    ROS_INFO("Resolution: %f", res);
     ROS_INFO("World coordinates: x: %f, y: %f, z: %f \n", origin.position.x, origin.position.y, origin.position.z);
     ROS_INFO("World rotation coordinates: %f, %f, %f, %f \n", origin.orientation.x, origin.orientation.y, origin.orientation.z, origin.orientation.w);
     cv::Mat drawing(1000, 1000, CV_8UC3, cv::Scalar(228, 229, 247));
     for (int i=0; i<4000*4000; i++) {
         if ((msg->data)[i] == 1) {
-            cv::Rect rect((i / 4000)/4, (i % 4000)/4, 1, 1);
+            cv::Rect rect((i / 4000) * res, (i % 4000) * res, 1, 1);
             cv::rectangle(drawing, rect, cv::Scalar(255, 255, 0), -1);
         }
     }
