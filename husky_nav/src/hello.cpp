@@ -81,7 +81,7 @@ void map_callback(const nav_msgs::OccupancyGrid::ConstPtr& msg)
     for (int i=0; i<4000; i++) {
         for (int j=0; j<4000; j++) {
             cv::Rect rect(i, j, 1, 1);
-            cv::Rectangle(drawing, rect, cv::Scalar(255, 255, 0), -1);
+            cv::rectangle(drawing, rect, cv::Scalar(255, 255, 0), -1);
         }
     }
     cv::imshow("WORLD DISPLAY", drawing);
