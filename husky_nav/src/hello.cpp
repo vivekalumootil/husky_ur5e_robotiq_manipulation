@@ -17,6 +17,8 @@
 
 // Navigation
 #include <nav_msgs/Odometry.h>
+#include <nav_msgs/OccupancyGrid.h>
+#include <nav_msgs/MapMetaData.h>
 
 // Include pcl
 #include <pcl_conversions/pcl_conversions.h>
@@ -68,6 +70,16 @@ ros::ServiceClient client;
   cv::waitKey(1);  
 */
 
+void map_callback(const nav_msgs::OccupancyGrid::ConstPtr& msg)
+{   
+    nav_msgs::MapMetaData info = msg->info;
+    nav_msgs::OccupancyGrid data = msg->data;
+    ROS_INFO("Got map %d %d", info.width, info.height);
+    geometry_msgs::Pose origin = info->origin;
+    ROS_INFO("Robot coordinates: x: %f, y: %f, z: %f \n", origin.position.x, origin.position.y, origin.position.z);
+    ROS_INFO("Robot rotation coordinates: %f, %f, %f, %f \n", origin.orientation.x, origin.orientation.y, origin.orientation.z, origin.orientation.w);
+
+}
 void laser_callback(const sensor_msgs::LaserScan::ConstPtr& msg)
 {
 
@@ -197,6 +209,7 @@ int main(int argc, char** argv)
   ros::Subscriber odom_sub_ = nh.subscribe(ODOM_TOPIC, 1, odom_callback);
   ros::Subscriber model_states_subscriber = nh.subscribe("/gazebo/model_states", 100, model_states_callback);
   ros::Subscriber laser_sub = nh.subscribe(LASER_TOPIC, 100, laser_callback);
+  ros::Subscriber map_sub = nh.subscribe("/map", 2000, map_callback);
   /*
   client = nh.serviceClient<gazebo_msgs::GetModelState>("/gazebo/get_model_state");
   gazebo_msgs::GetModelState get_model_state;
