@@ -78,12 +78,10 @@ void map_callback(const nav_msgs::OccupancyGrid::ConstPtr& msg)
     ROS_INFO("World coordinates: x: %f, y: %f, z: %f \n", origin.position.x, origin.position.y, origin.position.z);
     ROS_INFO("World rotation coordinates: %f, %f, %f, %f \n", origin.orientation.x, origin.orientation.y, origin.orientation.z, origin.orientation.w);
     cv::Mat drawing(4000, 4000, CV_8UC3, cv::Scalar(228, 229, 247));
-    for (int i=0; i<4000; i++) {
-        for (int j=0; j<4000; j++) {
-            if ((msg->data)[i][j] == 1) {
-                cv::Rect rect(i, j, 1, 1);
-                cv::rectangle(drawing, rect, cv::Scalar(255, 255, 0), -1);
-            }
+    for (int i=0; i<4000*4000; i++) {
+        if ((msg->data)[i] == 1) {
+            cv::Rect rect(i / 4000, i % 4000, 1, 1);
+            cv::rectangle(drawing, rect, cv::Scalar(255, 255, 0), -1);
         }
     }
     cv::imshow("WORLD DISPLAY", drawing);
