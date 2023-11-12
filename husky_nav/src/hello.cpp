@@ -75,7 +75,7 @@ void map_callback(const nav_msgs::OccupancyGrid::ConstPtr& msg)
     nav_msgs::MapMetaData info = msg->info;
     int[] data = msg->data;
     ROS_INFO("Got map %d %d", info.width, info.height);
-    geometry_msgs::Pose origin = info->origin;
+    geometry_msgs::Pose origin = info.origin;
     ROS_INFO("Robot coordinates: x: %f, y: %f, z: %f \n", origin.position.x, origin.position.y, origin.position.z);
     ROS_INFO("Robot rotation coordinates: %f, %f, %f, %f \n", origin.orientation.x, origin.orientation.y, origin.orientation.z, origin.orientation.w);
 
