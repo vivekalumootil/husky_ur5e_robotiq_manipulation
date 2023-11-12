@@ -177,7 +177,7 @@ void model_states_callback(gazebo_msgs::ModelStates model_states) {
   double roll, pitch, yaw;
   m.getRPY(roll, pitch, yaw);
   robot_dir = yaw;
-  std::cout << "The robot is located at: " << robot_x << " " << robot_y << " " << robot_z << " in direction" << roll << " " << pitch << " " << yaw << std::endl;
+  // std::cout << "The robot is located at: " << robot_x << " " << robot_y << " " << robot_z << " in direction" << roll << " " << pitch << " " << yaw << std::endl;
 }
 
 
