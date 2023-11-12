@@ -81,7 +81,7 @@ void map_callback(const nav_msgs::OccupancyGrid::ConstPtr& msg)
     ROS_INFO("World rotation coordinates: %f, %f, %f, %f \n", origin.orientation.x, origin.orientation.y, origin.orientation.z, origin.orientation.w);
     cv::Mat drawing(1000, 1000, CV_8UC3, cv::Scalar(228, 229, 247));
     for (int i=0; i<4000*4000; i++) {
-        if ((msg->data)[i] == 1) {
+        if ((msg->data)[i] >= 50) {
             cv::Rect rect((i / 4000) * res, (i % 4000) * res, 1, 1);
             cv::rectangle(drawing, rect, cv::Scalar(255, 255, 0), -1);
         }
