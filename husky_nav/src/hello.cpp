@@ -39,6 +39,8 @@
 static const std::string CLOUD_TOPIC = "/realsense/depth/color/points";
 static const std::string LASER_TOPIC = "/front/scan";
 static const std::string ODOM_TOPIC = "/odometry/filtered";
+static const int VISUAL_LEFT = 1800;
+static const int VISUAL_RIGHT = 2200;
 
 // SLAM[x][y] captures x=[0.01x,0.01x+0.01),y=[0.01y,0.01y+0.01)
 bool SLAM[1000][1000];
@@ -80,15 +82,28 @@ void map_callback(const nav_msgs::OccupancyGrid::ConstPtr& msg)
     ROS_INFO("World coordinates: x: %f, y: %f, z: %f \n", origin.position.x, origin.position.y, origin.position.z);
     ROS_INFO("World rotation coordinates: %f, %f, %f, %f \n", origin.orientation.x, origin.orientation.y, origin.orientation.z, origin.orientation.w);
     cv::Mat drawing(1000, 1000, CV_8UC3, cv::Scalar(228, 229, 247));
-    for (int i=0; i<4000*4000; i++) {
-        if ((msg->data)[i] >= 50) {
-            cv::Rect rect((i / 4000) * res, (i % 4000) * res, 1, 1);
-            cv::rectangle(drawing, rect, cv::Scalar(255, 255, 0), -1);
+    for (int i=VISUAL_LEFT*4000; i<VISUAL_RIGHT*4000; i+=1) {
+	int rx = i / 4000;
+        int ry = i % 4000;
+	// include VISUAL_LEFT to VISUAL_RIGHT for both dimensions
+	if (VISUAL_LEFT > rx or rx >= VISUAL_RIGHT or VISUAL_LEFT > ry or ry >= VISUAL_RIGHT)
+	    continue;
+	float scale = 1000/(VISUAL_RIGHT-VISUAL_LEFT);	
+        if ((msg->data)[i] >= 1) {
+            cv::Rect rect(scale*(rx-VISUAL_LEFT), scale*(ry-VISUAL_LEFT), scale, scale);
+            cv::rectangle(drawing, rect, cv::Scalar(255, (msg->data)[i]*2, 0), -1);
         }
     }
     cv::imshow("WORLD DISPLAY", drawing);
     cv::waitKey(1);  
 }
+
+void circle_detection_algorithm()
+{	
+
+
+}
+
 void laser_callback(const sensor_msgs::LaserScan::ConstPtr& msg)
 {
 
