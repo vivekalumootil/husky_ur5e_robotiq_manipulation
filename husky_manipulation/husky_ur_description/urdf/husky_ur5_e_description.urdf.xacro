@@ -15,7 +15,8 @@
   </joint>
 
   <xacro:ur5e_robot prefix="ur_arm_" />
-
+  
+  <xacro:include filename="realsense.urdf.xacro"/>
   <!-- Grippers
   <xacro:include filename="$(find husky_ur_description)/urdf/inc/ur_robotiq_2f_gripper.urdf.xacro" />
   <xacro:ur_robotiq_2f_gripper prefix="ur_arm_gripper" parent="ur_arm_tool0" />

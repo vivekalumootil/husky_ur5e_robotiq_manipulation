@@ -16,6 +16,7 @@
 
   <xacro:ur5_robot prefix="ur_arm_" />
 
+  <xacro:include filename="realsense.urdf.xacro"/>
   <!-- Grippers -->
   <xacro:if value="$(arg arm_gripper_enable)">
     <xacro:include filename="$(find husky_ur_description)/urdf/inc/ur_robotiq_2f_gripper.urdf.xacro" />

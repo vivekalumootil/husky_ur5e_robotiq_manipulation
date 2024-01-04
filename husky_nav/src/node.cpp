@@ -59,8 +59,8 @@ void cloud_callback(const sensor_msgs::PointCloud2ConstPtr& cloud_msg)
   depth_to_map = buffer_.lookupTransform("map", "front_realsense_gazebo", ros::Time(0), ros::Duration(1.0));
 
   for (int i=0; i<cloud_.size(); i++) {
-    data.push_back(cloud_.points[i]);
-    auto pt_ = data[i];
+    // data.push_back(cloud_.points[i]);
+    auto pt_ = cloud_.points[i];
     init_.pose.position.x = pt_.x;
     init_.pose.position.y = pt_.y;
     init_.pose.position.z = pt_.z;
@@ -72,8 +72,22 @@ void cloud_callback(const sensor_msgs::PointCloud2ConstPtr& cloud_msg)
     double dz = final_.pose.position.z;
     if ((abs(pt_.x) > 1 or abs(pt_.y) > 1 or abs(pt_.z) > 1) and dz >= 0) {
       // ROS_INFO("map: %f, %f, %f", dx, dy, dz);
+      data.push_back(pt_);
     }
   }
+
+  cv::Mat drawing(600, 600, CV_8UC3, cv::Scalar(228, 229, 247));
+
+  for (int i=0; i<data.size(); i++) {
+     if (data[i].z == data[i].z) {
+       std::cout << data[i].x << " " << data[i].y << " " << data[i].z << std::endl;
+       cv::Rect rect(100*data[i].x+200, 100*data[i].y+200, 3, 3);
+       cv::rectangle(drawing, rect, cv::Scalar(255, 255, 0), -1);
+     } 
+  }
+
+  cv::imshow("CROSS-SECTION DISPLAY", drawing);
+  cv::waitKey(1);
 
 }
 
@@ -94,6 +108,13 @@ void model_states_callback(gazebo_msgs::ModelStates model_states) {
 void odom_callback(const nav_msgs::Odometry::ConstPtr& odom_msg)
 {
   //ROS_INFO("x: %f, y: %f, z: %f", odom_msg->pose.pose.position.x, odom_msg->pose.pose.position.y, odom_msg->pose.pose.position.z); 
+}
+
+void cylinder_detection()
+{
+
+
+
 }
 
 int main(int argc, char** argv) 
