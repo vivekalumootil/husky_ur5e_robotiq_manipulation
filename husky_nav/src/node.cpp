@@ -49,7 +49,7 @@ static const std::string CLOUD_TOPIC = "/realsense/depth/color/points";
 static const std::string ODOM_TOPIC = "/odometry/filtered"; 
 // ros::Publisher pub;
 double global_x; double global_y; double global_z;
-cPT my_centers;
+CT my_center;
 
 double dist_2d(double x1, double y1, double x2, double y2)
 {
@@ -86,7 +86,7 @@ static bool angle_comparison(const PT &a, const PT &b)
       return get_angle(a.first, a.second) < get_angle(b.first, b.second);
 }
 
-cPT find_cylinders(vPT points)
+CT find_cylinders(vPT points)
 {
     
       cPT centers;
@@ -95,38 +95,39 @@ cPT find_cylinders(vPT points)
       // sort by angle
       std::sort(points.begin(), points.end(), angle_comparison);
       
-      // Create Mark array
-      int* mark = new int[points.size()];
-      for (int i=0; i<points.size(); i++) {
-        mark[i] = 0;
-      }
-      
       // Detect centers
       int t = points.size();
+      double bx = 0; double by = 0; double br = -1; int bs = -1; 
       for (int i=0; i<t-2; i++) {
         double dx; double dy; double r;
         find_circle(points[i].first, points[i].second, points[i+1].first, points[i+1].second, points[i+2].first, points[i+2].second, dx, dy, r);
-        int ctr = 0;
+        int score = 0;
         for (int j=0; j<points.size(); j++) {
-          if (mark[j] == 0) {
             if (abs(dist_2d(points[j].first, points[j].second, dx, dy)-r) <= 0.02) {
-              ctr += 1;
+              score += 1;
             }
-          }
         }
+	/*
         if (ctr >= nsize/1.7 and r <= 1.0) {
           for (int j=0; j<points.size(); j++) {
             if (abs(dist_2d(points[j].first, points[j].second, dx, dy)-r) <= 0.02) {
-              mark[j] = 1;
+              // mark[j] = 1;
+	      score += 1;
             }
           }
           //RCLCPP_INFO(this->get_logger(), "Center is calculated as  %f, %f before rotation", dx, dy);
 	    // std::cout << "center: " << dx << " " << dy << " " << r << std::endl;
             centers.push_back(CT(dx, dy, r));
         }
+	*/
+	if (score > nsize/2 and score > bs and r <= 0.7 and r >= 0.3) {
+	    bx = dx; by = dy; br = r; bs = score;
+	    std::cout << points[i].first << " " << points[i].second << " " << points[i+1].first << " " << points[i+1].second << " " << points[i+2].first << " " << points[i+2].second << std::endl;
+	    std::cout << bx << " " << by << " " << br << std::endl;
+	}
       }
-      
-      return centers;
+      std::cout << "bs: " << bs << std::endl;
+      return CT(bx, by, br);
 }
 
 void cloud_callback(const sensor_msgs::PointCloud2ConstPtr& cloud_msg)
@@ -171,16 +172,14 @@ geometry_msgs::PoseStamped init_;
   }
 
   cv::Mat drawing(900, 900, CV_8UC3, cv::Scalar(228, 229, 247));
-  my_centers = find_cylinders(mmap);
-  std::cout << "Listing Circles" << std::endl;
-  for (int i=0; i<my_centers.size(); i++) {
-        double px = std::get<0>(my_centers[i]); 
-	double py = std::get<1>(my_centers[i]);
-	double R = std::get<2>(my_centers[i]);
+  my_center = find_cylinders(mmap);
+  double px = std::get<0>(my_center);
+  double py = std::get<1>(my_center);
+  double R = std::get<2>(my_center);
+  if (R > 0) {
 	std::cout << "Found circle with center (" << px << ", " << py << ") with radius " << R << std::endl;
         cv::circle(drawing, cv::Point(100*px+300, 100*py+300), 100*R, cv::Scalar(214, 140, 43), -1);
   }
-
   for (int i=0; i<mmap.size(); i++) {
        // std::cout << data[i].x << " " << data[i].y << " " << data[i].z << std::endl;
        cv::Rect rect(100*mmap[i].first+300, 100*mmap[i].second+300, 2, 2);
