@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <utility>
+#include <cstdlib>
 
 // Gazebo libraries
 #include <gazebo_msgs/LinkStates.h>
@@ -97,36 +98,41 @@ CT find_cylinders(vPT points)
       
       // Detect centers
       int t = points.size();
-      double bx = 0; double by = 0; double br = -1; int bs = -1; 
-      for (int i=0; i<t-2; i++) {
+      int sample = 1000;
+      double bx = 0; double by = 0; double br = -1; double bs = 100000; 
+      for (int i=0; i<t-7; i++) {
+	int a = i;
+	int b = i+3;
+	int c = i+6;
+	if (a == b or b == c or a == c)
+		break;
         double dx; double dy; double r;
-        find_circle(points[i].first, points[i].second, points[i+1].first, points[i+1].second, points[i+2].first, points[i+2].second, dx, dy, r);
+	std::vector<double> dists;
+        find_circle(points[a].first, points[a].second, points[b].first, points[b].second, points[c].first, points[c].second, dx, dy, r);
         int score = 0;
         for (int j=0; j<points.size(); j++) {
-            if (abs(dist_2d(points[j].first, points[j].second, dx, dy)-r) <= 0.02) {
-              score += 1;
+            if (abs(dist_2d(points[j].first, points[j].second, dx, dy)-r) <= 0.2) {
+              	dists.push_back(abs(dist_2d(points[j].first, points[j].second, dx, dy)-r));
+		score += 1;
             }
         }
-	/*
-        if (ctr >= nsize/1.7 and r <= 1.0) {
-          for (int j=0; j<points.size(); j++) {
-            if (abs(dist_2d(points[j].first, points[j].second, dx, dy)-r) <= 0.02) {
-              // mark[j] = 1;
-	      score += 1;
-            }
-          }
-          //RCLCPP_INFO(this->get_logger(), "Center is calculated as  %f, %f before rotation", dx, dy);
-	    // std::cout << "center: " << dx << " " << dy << " " << r << std::endl;
-            centers.push_back(CT(dx, dy, r));
-        }
-	*/
-	if (score > nsize/2 and score > bs and r <= 0.7 and r >= 0.3) {
-	    bx = dx; by = dy; br = r; bs = score;
-	    std::cout << points[i].first << " " << points[i].second << " " << points[i+1].first << " " << points[i+1].second << " " << points[i+2].first << " " << points[i+2].second << std::endl;
+	std::sort(dists.begin(), dists.end());
+	if (score > 10 and r <= 0.55 and r >= 0.45) {
+	    int metric = 1;
+	    for (int ind=0; ind<10; ind++) {
+	       metric += dists[i];
+	    }
+	    metric /= 10;
+	    metric /= score;
+	    metric * abs(r-0.5);
+	    if (metric < bs) {
+	      bx = dx; by = dy; br = r; bs = metric;
+	    }
+	    // std::cout << points[i].first << " " << points[i].second << " " << points[i+1].first << " " << points[i+1].second << " " << points[i+2].first << " " << points[i+2].second << std::endl;
 	    std::cout << bx << " " << by << " " << br << std::endl;
 	}
       }
-      std::cout << "bs: " << bs << std::endl;
+      std::cout << "lowest metric found: " << bs << std::endl;
       return CT(bx, by, br);
 }
 
@@ -212,6 +218,7 @@ void odom_callback(const nav_msgs::Odometry::ConstPtr& odom_msg)
 
 int main(int argc, char** argv) 
 {
+  srand((unsigned) time(NULL));
   ros::init (argc, argv, "cloud_sub_pub");
   ros::NodeHandle nh;
   ros::Rate loop_rate(10);
