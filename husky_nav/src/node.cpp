@@ -38,6 +38,9 @@
 #include <image_transport/image_transport.h>
 #include <opencv2/imgproc/imgproc.hpp>
 
+// MoveIt!
+#include <moveit/move_group_interface/move_group_interface.h>
+
 typedef std::vector<std::pair<double, double>> vPT;
 typedef std::vector<std::tuple<double, double, double>> cPT;
 typedef std::pair<double, double> PT;
@@ -47,7 +50,10 @@ typedef std::tuple<double, double, double> CT;
 #define RAD2DEG 57.2957
 
 static const std::string CLOUD_TOPIC = "/realsense/depth/color/points";
-static const std::string ODOM_TOPIC = "/odometry/filtered"; 
+static const std::string ODOM_TOPIC = "/odometry/filtered";
+static const double r_cylinder = 0.1;
+static const double h_cylinder = 0.2;
+
 // ros::Publisher pub;
 double global_x; double global_y; double global_z;
 CT my_center;
@@ -111,25 +117,30 @@ CT find_cylinders(vPT points)
         find_circle(points[a].first, points[a].second, points[b].first, points[b].second, points[c].first, points[c].second, dx, dy, r);
         int score = 0;
         for (int j=0; j<points.size(); j++) {
-            if (abs(dist_2d(points[j].first, points[j].second, dx, dy)-r) <= 0.2) {
+            if (abs(dist_2d(points[j].first, points[j].second, dx, dy)-r) <= 0.1) {
               	dists.push_back(abs(dist_2d(points[j].first, points[j].second, dx, dy)-r));
 		score += 1;
             }
         }
 	std::sort(dists.begin(), dists.end());
-	if (score > 10 and r <= 0.55 and r >= 0.45) {
-	    int metric = 1;
+	if (score > 10 and r <= r_cylinder*1.1 and r >= r_cylinder*0.9) {
+	    double metric = 1.0;
+	    /*
 	    for (int ind=0; ind<10; ind++) {
 	       metric += dists[i];
 	    }
 	    metric /= 10;
 	    metric /= score;
 	    metric * abs(r-0.5);
+	    */
+	    metric = metric/score;
+	    metric = metric*abs(r-r_cylinder);
+
 	    if (metric < bs) {
 	      bx = dx; by = dy; br = r; bs = metric;
 	    }
 	    // std::cout << points[i].first << " " << points[i].second << " " << points[i+1].first << " " << points[i+1].second << " " << points[i+2].first << " " << points[i+2].second << std::endl;
-	    std::cout << bx << " " << by << " " << br << std::endl;
+	    // std::cout << bx << " " << by << " " << br << std::endl;
 	}
       }
       std::cout << "lowest metric found: " << bs << std::endl;
@@ -152,6 +163,8 @@ geometry_msgs::PoseStamped init_;
   depth_to_map = buffer_.lookupTransform("odom", "front_realsense_gazebo", ros::Time(0), ros::Duration(1.0));
 
   vPT mmap;
+  ROS_INFO("#points: %d", cloud_.size());
+  int buckets[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
   for (int i=0; i<cloud_.size(); i++) {
     // data.push_back(cloud_.points[i]);
     auto pt_ = cloud_.points[i];
@@ -164,17 +177,25 @@ geometry_msgs::PoseStamped init_;
     double dx = final_.pose.position.x;
     double dy = final_.pose.position.y;
     double dz = final_.pose.position.z;
-    if (dz >= 0.5 and dz <= 0.501) {
+    // ROS_INFO("map: %f, %f, %f", dx, dy, dz);
+    if (dz >= 0)
+      buckets[(int) (dz/0.1)] += 1;
+    if (dz >= 0.3 and dz <= 0.31) {
       // ROS_INFO("map: %f, %f, %f", dx, dy, dz);
       // auto dp_ = pcl::PointXYZ(dx, dy, dz);
       // data.push_back(dp_);
       mmap.push_back(PT(dx, dy));
     }
-    if (dz >= 0.1 and dz <= 0.9) {
+    /*
+    if (dz >= 0 and dz <= 0.9) {
       // ROS_INFO("map: %f, %f, %f", dx, dy, dz);
       auto dp_ = pcl::PointXYZ(dx, dy, dz);
       data.push_back(dp_);
     }
+    */
+  }
+  for (int i=0; i<10; i++) {
+    std::cout << i << ": " << buckets[i] << std::endl;
   }
 
   cv::Mat drawing(900, 900, CV_8UC3, cv::Scalar(228, 229, 247));
@@ -197,25 +218,6 @@ geometry_msgs::PoseStamped init_;
 
 }
 
-void model_states_callback(gazebo_msgs::ModelStates model_states) {
-  int ind = 0;
-  for (ind=0; ind<(model_states.name).size(); ind++) {
-    if (model_states.name[ind] == "husky") {
-      break;
-    }
-  }
-  geometry_msgs::Pose husky_pose = model_states.pose[ind];
-  global_x = ((husky_pose).position).x;
-  global_y = ((husky_pose).position).y;
-  global_z = ((husky_pose).position).z;
-  // std::cout << "The robot is located at: " << global_x << " " << global_y << " " << global_z << std::endl;
-}
-
-void odom_callback(const nav_msgs::Odometry::ConstPtr& odom_msg)
-{
-  //ROS_INFO("x: %f, y: %f, z: %f", odom_msg->pose.pose.position.x, odom_msg->pose.pose.position.y, odom_msg->pose.pose.position.z); 
-}
-
 int main(int argc, char** argv) 
 {
   srand((unsigned) time(NULL));
@@ -223,7 +225,7 @@ int main(int argc, char** argv)
   ros::NodeHandle nh;
   ros::Rate loop_rate(10);
   ros::Subscriber cloud_sub_ = nh.subscribe(CLOUD_TOPIC, 1, cloud_callback);
-  ros::Subscriber model_states_subscriber = nh.subscribe("/gazebo/model_states", 100, model_states_callback);
-  ros::Subscriber odom_sub_ = nh.subscribe(ODOM_TOPIC, 1, odom_callback);
+
   ros::spin();
+
 }

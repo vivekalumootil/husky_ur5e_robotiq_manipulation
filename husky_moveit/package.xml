@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>husky_nav</name>
+  <name>husky_moveit</name>
   <version>0.0.0</version>
-  <description>The srilab husky navigation package</description>
+  <description>The srilab husky moveit package</description>
 
   <maintainer email="vivekalumootil@gmail.com">srilab</maintainer>
 
